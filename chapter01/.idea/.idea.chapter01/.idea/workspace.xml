@@ -11,6 +11,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/99258562-0D64-4271-98DD-F3A0E1467733/09/ea7b40f3/Math.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/AF74501D-C8EF-4715-A62D-5ABC48D192D3/b5/3eca897d/Input.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/F6C5B798-1CB1-4F39-B4CE-4A661BFE9B97/8f/a160ca32/Mathf.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/F6C5B798-1CB1-4F39-B4CE-4A661BFE9B97/6a/5d595296/KeyCode.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -25,9 +26,11 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/Obstacle.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GroundController.cs" />
         <option value="$PROJECT_DIR$/Assets/GameController.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/GameController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Editor/MinMaxDrawer.cs" />
+        <option value="$PROJECT_DIR$/Assets/Editor/FloatRangeDrawer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/MapController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/GameController.cs" />
       </list>
     </option>
   </component>
@@ -78,7 +81,7 @@
       <workItem from="1602582240375" duration="6413000" />
       <workItem from="1602672896546" duration="5821000" />
       <workItem from="1602699352903" duration="20862000" />
-      <workItem from="1602749827781" duration="15388000" />
+      <workItem from="1602749827781" duration="28873000" />
     </task>
     <servers />
   </component>
@@ -155,10 +158,10 @@
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
     <state width="1802" height="367" key="GridCell.Tab.3.right/72.27.1848.1053@72.27.1848.1053" timestamp="1602699321307" />
-    <state x="814" y="250" width="423" height="613" key="RiderGenerateDialog" timestamp="1602766294500">
+    <state x="814" y="250" width="634" height="613" key="RiderGenerateDialog" timestamp="1602783963387">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="814" y="250" width="423" height="613" key="RiderGenerateDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1602766294500" />
+    <state x="814" y="250" width="634" height="613" key="RiderGenerateDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1602783963387" />
     <state x="126" y="31" width="1758" height="1022" key="SettingsEditor" timestamp="1602713590292">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
@@ -167,28 +170,13 @@
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
     <state x="690" y="149" width="1045" height="806" key="find.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1602673250033" />
-    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1602765695233">
+    <state x="660" y="252" key="run.anything.popup" timestamp="1602781736117">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1602765695233" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/Scripts/MapController.cs</url>
-          <line>64</line>
-          <properties documentPath="$PROJECT_DIR$/Assets/Scripts/MapController.cs" initialLine="58">
-            <startOffsets>
-              <option value="1967" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1968" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <state x="660" y="252" key="run.anything.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1602781736117" />
+    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1602779674700">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="659" y="259" width="672" height="678" key="search.everywhere.popup/72.27.1848.1053@72.27.1848.1053" timestamp="1602779674700" />
   </component>
 </project>

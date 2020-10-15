@@ -12,11 +12,14 @@ public class PlayerController : MonoBehaviour {
     public float dashDuration = 0.1f;
     public float dashCooldown = 0.5f; // total time after dash is renewed
 
-    private float _moveX         = 0f;
-    private float _dashTimer     = 0f; // we can compare to float 0f since it's not a numeric error
-    private bool  _dashTriggered = false;
+    public event Action<PlayerController> PlayerDied;
 
-    [SerializeField] private TextMeshProUGUI lifesText;
+    private float _moveX;
+    private float _dashTimer; // we can compare to float 0f since it's not a numeric error
+    private bool  _dashTriggered;
+
+    [SerializeField] private bool            godmode   = false;
+    [SerializeField] private TextMeshProUGUI lifesText = null;
     private                  int             _lifes;
 
     public int Lifes {
@@ -27,26 +30,25 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    public void reset() {
+        transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _dashTimer     = 0f;
+        _dashTriggered = false;
+        Lifes          = 3;
+    }
+    
+    public void move(float playerMoveDirection) => _moveX = playerMoveDirection;
 
-    private void setLifes(int lifes) { _lifes = lifes; }
+    public void triggerDash() => _dashTriggered = true;
 
-    private void Awake() { setLifes(3); }
-
-    private void Update() {
-        // determine move direction
-        _moveX = 0f
-               + (Input.GetKey(KeyCode.RightArrow) ? 1f : 0f)
-               - (Input.GetKey(KeyCode.LeftArrow) ? 1f : 0f);
-
-        // reset dash after cooldown and shift release
-        if (Input.GetKeyUp(KeyCode.LeftShift) && _dashTimer >= dashCooldown) {
+    public void releaseDash() {
+        if (_dashTimer >= dashCooldown) {
             _dashTriggered = false;
             _dashTimer     = 0f;
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !_dashTriggered)
-            _dashTriggered = true;
     }
+
+    private void Awake() { reset(); }
 
     private void FixedUpdate() {
         var speed = normalSpeed;
@@ -61,12 +63,14 @@ public class PlayerController : MonoBehaviour {
         rigidbody.velocity = velocity;
     }
 
-    public event Action<PlayerController> PlayerDied;
-
     private void OnTriggerEnter(Collider other) {
-        if (--Lifes > 0) {
+        if(godmode) return;
+        --Lifes;
+        if (Lifes > 0) {
             Destroy(other.gameObject);
-        } else
+        } else {
+            _moveX = 0;
             PlayerDied?.Invoke(this);
+        }
     }
 }
