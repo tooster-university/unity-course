@@ -26,8 +26,8 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/GroundController.cs" />
         <option value="$PROJECT_DIR$/Assets/GameController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/GameController.cs" />
-        <option value="$PROJECT_DIR$/Assets/Scripts/MapController.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/MapController.cs" />
       </list>
     </option>
   </component>
@@ -78,7 +78,7 @@
       <workItem from="1602582240375" duration="6413000" />
       <workItem from="1602672896546" duration="5821000" />
       <workItem from="1602699352903" duration="20862000" />
-      <workItem from="1602749827781" duration="14928000" />
+      <workItem from="1602749827781" duration="15388000" />
     </task>
     <servers />
   </component>
@@ -180,10 +180,10 @@
           <line>64</line>
           <properties documentPath="$PROJECT_DIR$/Assets/Scripts/MapController.cs" initialLine="58">
             <startOffsets>
-              <option value="1970" />
+              <option value="1967" />
             </startOffsets>
             <endOffsets>
-              <option value="1971" />
+              <option value="1968" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="1" />

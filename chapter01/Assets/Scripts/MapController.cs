@@ -32,7 +32,7 @@ public class MapController : MonoBehaviour {
     private static readonly Vector3 MOTION_VECTOR = Vector3.back;
 
     
-    void OnEnable() {
+    void Awake() {
         scoreText.color = NORMAL_COLOR;
 
         if (_groundMaterial == null) _groundMaterial = ground.GetComponent<Renderer>().material;

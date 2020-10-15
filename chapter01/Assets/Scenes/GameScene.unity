@@ -1405,7 +1405,7 @@ MonoBehaviour:
   spawnDelay: 1
   difficulty: 4
   obstacles: {fileID: 1197817040}
-  scoreText: {fileID: 0}
+  scoreText: {fileID: 694278260}
   mapBounds: {fileID: 759839119}
   spawnpoints: {fileID: 1200464789}
   ground: {fileID: 759839118}
