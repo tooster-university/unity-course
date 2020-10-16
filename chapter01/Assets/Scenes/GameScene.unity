@@ -852,7 +852,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.6586183, y: 0.9543484, z: 0.3078564}
+  m_Size: {x: 0.54, y: 0.9543484, z: 0.13}
   m_Center: {x: 0, y: 0.44999993, z: 0.0076145246}
 --- !u!114 &1191628268
 MonoBehaviour:
@@ -866,7 +866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dd2bccb037c46609862a8965f5a79c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  godmode: 1
+  godmode: 0
   lifesText: {fileID: 1300043212}
   lanes: {fileID: 1200464789}
   rigidbody: {fileID: 1191628266}
@@ -1701,9 +1701,9 @@ MonoBehaviour:
   mapController: {fileID: 1617227804}
   playerController: {fileID: 1191628268}
   jumboText: {fileID: 1258311715}
-  windupTime: 15
-  mapSpeed: {x: 2, y: 10}
-  obstacleDistance: {x: 5, y: 2.5}
+  windupTime: 60
+  mapSpeed: {x: 4, y: 10}
+  obstacleDistance: {x: 4, y: 2.5}
   difficulty: 4
   fastForwardDistance: 20
   fastForwardTimescale: 5

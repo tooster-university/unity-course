@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net.NetworkInformation;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class GameController : MonoBehaviour {
     public MapController    mapController    = null;
