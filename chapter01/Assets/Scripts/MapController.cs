@@ -10,7 +10,7 @@ public class MapController : MonoBehaviour {
     [SerializeField] private GameObject      spawnpoints     = null;
     [SerializeField] private GameObject      ground          = null;
     [SerializeField] private GameObject      obstacles       = null;
-    [SerializeField] private GameObject[]    obstaclePrefabs = null;
+    [SerializeField] private Obstacle[]      obstaclePrefabs = null;
 
     [NonSerialized] public float scrollSpeed      = 0f;
     [NonSerialized] public float obstacleDistance = 3f;
@@ -30,7 +30,7 @@ public class MapController : MonoBehaviour {
 
     public void reset() {
         DistanceTravelled  = 0f;
-        _lastSpawnDistance = -obstacleDistance;           // to make it spawn in first frame
+        _lastSpawnDistance = -obstacleDistance;          // to make it spawn in first frame
         foreach (Transform child in obstacles.transform) // cleanup
             Destroy(child.gameObject);
         scoreText.color = NORMAL_COLOR;
@@ -91,7 +91,7 @@ public class MapController : MonoBehaviour {
         // for random indexes in spawnpoints spawn obstacles
         foreach (var idx in Enumerable.Range(0, childCount).OrderBy(x => Guid.NewGuid()).Take(obstaclesToSpawn)) {
             var prefabIdx = Random.Range(0, obstaclePrefabs.Length);
-            var obstacle = Instantiate(obstaclePrefabs[prefabIdx],
+            var obstacle = Instantiate(obstaclePrefabs[prefabIdx].gameObject,
                                        spawnpoints.transform.GetChild(idx).position,
                                        Quaternion.identity,
                                        obstacles.transform);

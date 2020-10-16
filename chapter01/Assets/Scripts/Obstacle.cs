@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
+// Use layer collisions
+[RequireComponent(typeof(Collider))]
 public class Obstacle : MonoBehaviour {
-    [SerializeField] private Collider       collider;
-    [SerializeField] private GameObject     model;
-    [SerializeField] private ParticleSystem particleSystem;
-    [SerializeField] private AudioSource    sound;
+    [SerializeField] private new Collider       collider       = null;
+    [SerializeField] private     GameObject     model          = null;
+    [SerializeField] private new ParticleSystem particleSystem = null;
+
+    [SerializeField] protected Action<Collider> onCollide = null;
 
     private void OnTriggerEnter(Collider other) {
-        if (other.gameObject.CompareTag("Player")) {
-            other.gameObject.GetComponent<PlayerController>().takeDamage(1);
-            collider.enabled = false;
-            model.SetActive(false);
-            particleSystem.Play();
-            sound.Play();
-        }
+        onCollide?.Invoke(other);
+        collider.enabled = false;
+        if (model) model.SetActive(false);
+        if (particleSystem) particleSystem.Play();
     }
 }

@@ -2,24 +2,28 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using UnityEngine.UIElements.Experimental;
 
 
 public class PlayerController : MonoBehaviour {
-    [SerializeField] private bool            godmode   = false;
-    [SerializeField] private TextMeshProUGUI lifesText = null;
-    [SerializeField] private GameObject      lanes     = null; // keeps children with lanes to swap onto
+    [SerializeField] private bool            godMode    = false;
+    [SerializeField] private TextMeshProUGUI lifesText  = null;
+    [SerializeField] private GameObject      lanes      = null; // keeps children with lanes to swap onto
+    [SerializeField] private AudioClip       dashSound  = null;
+    [SerializeField] private AudioClip       jumpSound  = null;
+    [SerializeField] private AudioClip       crashSound = null;
+    [SerializeField] private AudioClip       dieSound   = null;
 
-    public new Rigidbody                  rigidbody;
-    public     float                      dashDuration = 0.1f;
+    [NonSerialized] public Animator animator;
+
+    public float                          dashDuration = 0.1f;
     public event Action<PlayerController> PlayerDied;
 
 
-    private float _dashTimer = 0.0f;
-    private int   _lifes     = 3;
-    private int   _currentLane;
-    private int   _targetLane;
+    private Rigidbody _rigidbody;
+    private float     _dashTimer = 0.0f;
+    private int       _lifes     = 3;
+    private int       _currentLane;
+    private int       _targetLane;
 
     private int Lifes {
         get => _lifes;
@@ -31,12 +35,16 @@ public class PlayerController : MonoBehaviour {
 
     public void reset() {
         transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        _dashTimer   = 0f;
-        Lifes        = 3;
-        _currentLane = _targetLane = lanes.transform.childCount / 2; // middle lane
+        _dashTimer       = 0f;
+        Lifes            = 3;
+        _currentLane     = _targetLane = lanes.transform.childCount / 2; // middle lane
     }
 
-    private void Awake() { reset(); }
+    private void Awake() {
+        animator   = GetComponent<Animator>();
+        _rigidbody = GetComponent<Rigidbody>();
+        reset();
+    }
 
     private void FixedUpdate() {
         // if dashing
@@ -48,6 +56,7 @@ public class PlayerController : MonoBehaviour {
                 _currentLane = _targetLane;
             }
         } else if (_dashTimer == 0f && InputBuffer.pollAction(InputAction.DASH)) {
+            AudioSource.PlayClipAtPoint(dashSound, transform.position);
             _dashTimer += Time.fixedDeltaTime;
             // if not dashing, and polling resulted in dash
             var direction = (MoveDirection) InputBuffer.getData(InputAction.DASH);
@@ -65,14 +74,18 @@ public class PlayerController : MonoBehaviour {
         var endPos   = startPos;
         startPos.x = lanes.transform.GetChild(_currentLane).transform.position.x;
         endPos.x   = lanes.transform.GetChild(_targetLane).transform.position.x;
-        rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, _dashTimer / dashDuration));
+        _rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, _dashTimer / dashDuration));
     }
 
     public void takeDamage(int damage) {
-        if (godmode) return;
-
-        Lifes -= damage;
-        if (Lifes == 0)
+        if (!godMode) Lifes -= damage;
+        if (Lifes == 0) {
+            AudioSource.PlayClipAtPoint(dieSound, transform.position);
             PlayerDied?.Invoke(this);
+        } else {
+            AudioSource.PlayClipAtPoint(crashSound, transform.position);
+        }
     }
+
+    public void playJumpSound() { AudioSource.PlayClipAtPoint(jumpSound, transform.position); }
 }
