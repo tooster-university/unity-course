@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class MapController : MonoBehaviour {

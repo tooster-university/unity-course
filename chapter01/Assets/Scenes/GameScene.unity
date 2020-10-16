@@ -217,7 +217,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: -456.7}
+  m_AnchoredPosition: {x: -0.000030517578, y: -408.1}
   m_SizeDelta: {x: 1146.5912, y: 221.3558}
   m_Pivot: {x: 0.49999994, y: 0.50000006}
 --- !u!114 &694278260
@@ -866,13 +866,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dd2bccb037c46609862a8965f5a79c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbody: {fileID: 1191628266}
-  normalSpeed: 120
-  dashSpeed: 350
-  dashDuration: 0.1
-  dashCooldown: 0.1
   godmode: 1
   lifesText: {fileID: 1300043212}
+  lanes: {fileID: 1200464789}
+  rigidbody: {fileID: 1191628266}
+  dashDuration: 0.2
 --- !u!1 &1197817040
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,7 +911,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1200464790}
   m_Layer: 0
-  m_Name: spawners
+  m_Name: lanes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1191,7 +1189,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 184.05957, y: -456.7}
+  m_AnchoredPosition: {x: 209.5, y: -408.1}
   m_SizeDelta: {x: 368.11377, y: 221.3558}
   m_Pivot: {x: 0.49999994, y: 0.50000006}
 --- !u!114 &1300043212
@@ -1680,6 +1678,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2017109722}
   - component: {fileID: 2017109721}
+  - component: {fileID: 2017109723}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -1707,7 +1706,7 @@ MonoBehaviour:
   obstacleDistance: {x: 5, y: 2}
   difficulty: 4
   fastForwardDistance: 20
-  fastForwardTimescale: 3
+  fastForwardTimescale: 2.1
 --- !u!4 &2017109722
 Transform:
   m_ObjectHideFlags: 0
@@ -1722,3 +1721,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2017109723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017109720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5cc2c047e3213fe1bc55f7ea7e5e3e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  earlyInputForgiveness: 0.1

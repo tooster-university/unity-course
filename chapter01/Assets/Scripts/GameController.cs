@@ -9,12 +9,12 @@ public class GameController : MonoBehaviour {
     public PlayerController playerController = null;
     public TextMeshProUGUI  jumboText        = null;
 
-    [SerializeField]              private float   windupTime           = 60f;
-    [SerializeField]              private Vector2 mapSpeed             = new Vector2(2f, 10f);
-    [SerializeField]              private Vector2 obstacleDistance     = new Vector2(10f, 2f);
-    [SerializeField, Range(1, 4)] private int     difficulty           = 1;
-    [SerializeField]              private float   fastForwardDistance  = 30f;
-    [SerializeField]              private float   fastForwardTimescale = 10f;
+    [SerializeField] private float       windupTime           = 60f;
+    [SerializeField] private Vector2     mapSpeed             = new Vector2(2f, 10f);
+    [SerializeField] private Vector2     obstacleDistance     = new Vector2(10f, 2f);
+    [SerializeField] private int         difficulty           = 1;
+    [SerializeField] private float       fastForwardDistance  = 30f;
+    [SerializeField] private float       fastForwardTimescale = 10f;
 
     public static GameController Instance { get; private set; }
 
@@ -58,7 +58,7 @@ public class GameController : MonoBehaviour {
             case State.WELCOME: goto restart;
             case State.DIED:
                 restart:
-                if (Input.GetKeyDown(KeyCode.R))
+                if (InputBuffer.pollAction(InputAction.RESTART))
                     GameState = State.PLAYING;
                 break;
             case State.PLAYING:
@@ -73,17 +73,11 @@ public class GameController : MonoBehaviour {
                 mapController.obstacleDistance =
                     Mathf.Lerp(obstacleDistance.x, obstacleDistance.y, (_playingTimer - windupTime) / windupTime);
                 mapController.difficulty = difficulty;
-                
+
                 if (mapController.DistanceTravelled < fastForwardDistance) {
                     Time.timeScale = fastForwardTimescale;
                 } else {
                     Time.timeScale = 1f;
-                    playerController.move((Input.GetKey(KeyCode.RightArrow) ? 1f : 0f)
-                                        - (Input.GetKey(KeyCode.LeftArrow) ? 1f : 0f));
-                    if (Input.GetKeyDown(KeyCode.LeftShift))
-                        playerController.triggerDash();
-                    if (Input.GetKeyUp(KeyCode.LeftShift))
-                        playerController.releaseDash();
                 }
 
                 break;
@@ -92,10 +86,12 @@ public class GameController : MonoBehaviour {
     }
 
     void Awake() {
-        if (Instance == null)
+        if (Instance == null) {
             Instance = this;
-        else
-            Debug.Log("Warning: multiple " + this + " in scene!");
+            DontDestroyOnLoad(gameObject);
+        } else {
+            Destroy(this);
+        }
     }
 
     // Start is called before the first frame update
