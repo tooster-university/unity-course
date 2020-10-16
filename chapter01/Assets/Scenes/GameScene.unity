@@ -215,10 +215,10 @@ RectTransform:
   m_Father: {fileID: 856515893}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: -408.1}
-  m_SizeDelta: {x: 1146.5912, y: 221.3558}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -207.90039, y: -408.0996}
+  m_SizeDelta: {x: 1146.5913, y: 221.3558}
   m_Pivot: {x: 0.49999994, y: 0.50000006}
 --- !u!114 &694278260
 MonoBehaviour:
@@ -274,7 +274,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 16
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -303,7 +303,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 1
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 512.27167, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -870,7 +870,7 @@ MonoBehaviour:
   lifesText: {fileID: 1300043212}
   lanes: {fileID: 1200464789}
   rigidbody: {fileID: 1191628266}
-  dashDuration: 0.2
+  dashDuration: 0.03
 --- !u!1 &1197817040
 GameObject:
   m_ObjectHideFlags: 0
@@ -1189,7 +1189,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 209.5, y: -408.1}
+  m_AnchoredPosition: {x: 229, y: -408.0996}
   m_SizeDelta: {x: 368.11377, y: 221.3558}
   m_Pivot: {x: 0.49999994, y: 0.50000006}
 --- !u!114 &1300043212
@@ -1349,9 +1349,9 @@ MonoBehaviour:
   m_DeadZoneHeight: 0.04369863
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
-  m_SoftZoneWidth: 0.11
+  m_SoftZoneWidth: 0.297251
   m_SoftZoneHeight: 0.12
-  m_BiasX: 0
+  m_BiasX: -0.00000044605744
   m_BiasY: 0
   m_CenterOnActivate: 1
   m_GroupFramingMode: 2
@@ -1703,10 +1703,10 @@ MonoBehaviour:
   jumboText: {fileID: 1258311715}
   windupTime: 15
   mapSpeed: {x: 2, y: 10}
-  obstacleDistance: {x: 5, y: 2}
+  obstacleDistance: {x: 5, y: 2.5}
   difficulty: 4
   fastForwardDistance: 20
-  fastForwardTimescale: 2.1
+  fastForwardTimescale: 5
 --- !u!4 &2017109722
 Transform:
   m_ObjectHideFlags: 0

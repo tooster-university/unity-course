@@ -12,7 +12,7 @@ public enum InputAction {
 public class InputBuffer : MonoBehaviour {
     public double earlyInputForgiveness = 0.1f;
 
-    private static double _now;
+    private static double _now = 0;
 
     private struct ActionStruct {
         public double? timing;
@@ -74,7 +74,7 @@ public class InputBuffer : MonoBehaviour {
     private event Action KeyDetectors = () => { };
 
     private void Update() {
-        _now += Time.unscaledTime;
+        _now = Time.unscaledTime;
         KeyDetectors.Invoke();
     }
 }

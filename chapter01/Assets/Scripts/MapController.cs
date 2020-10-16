@@ -81,11 +81,11 @@ public class MapController : MonoBehaviour {
         var childCount = spawnpoints.transform.childCount;
 
         // roll maximum number of barrels scaled with difficulty
-        int obstaclesToSpawn = Random.Range(1, Math.Min(difficulty, childCount - 1));
+        int obstaclesToSpawn = Random.Range(0, Math.Min(difficulty, childCount - 1));
         if (difficulty > 1)
-            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(1, Math.Min(difficulty, childCount - 1)));
+            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(0, Math.Min(difficulty, childCount - 1)));
         if (difficulty > 2)
-            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(1, Math.Min(difficulty, childCount - 1)));
+            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(0, Math.Min(difficulty, childCount - 1)));
 
 
         // for random indexes in spawnpoints spawn obstacles

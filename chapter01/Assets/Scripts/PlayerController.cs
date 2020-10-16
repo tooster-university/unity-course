@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour {
         var endPos   = startPos;
         startPos.x = lanes.transform.GetChild(_currentLane).transform.position.x;
         endPos.x   = lanes.transform.GetChild(_targetLane).transform.position.x;
-        rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, Easing.OutPower(_dashTimer / dashDuration, 5)));
+        rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, _dashTimer / dashDuration));
     }
 
     private void OnTriggerEnter(Collider other) {
