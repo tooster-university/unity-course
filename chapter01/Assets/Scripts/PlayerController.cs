@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour {
     private int Lifes {
         get => _lifes;
         set {
-            _lifes         = value;
+            _lifes         = Math.Max(0, value);
             lifesText.text = new string('#', _lifes);
         }
     }
@@ -68,14 +68,11 @@ public class PlayerController : MonoBehaviour {
         rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, _dashTimer / dashDuration));
     }
 
-    private void OnTriggerEnter(Collider other) {
+    public void takeDamage(int damage) {
         if (godmode) return;
 
-        --Lifes;
-        if (Lifes > 0) {
-            Destroy(other.gameObject);
-        } else {
+        Lifes -= damage;
+        if (Lifes == 0)
             PlayerDied?.Invoke(this);
-        }
     }
 }
