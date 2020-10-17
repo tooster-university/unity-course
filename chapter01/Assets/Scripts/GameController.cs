@@ -2,13 +2,14 @@
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour {
     public MapController    mapController    = null;
     public PlayerController playerController = null;
     public TextMeshProUGUI  jumboText        = null;
 
-    [SerializeField] private float   windupTime           = 60f;
+    [SerializeField] private float   windupDistance       = 300;
     [SerializeField] private Vector2 mapSpeed             = new Vector2(2f, 10f);
     [SerializeField] private Vector2 obstacleDistance     = new Vector2(10f, 2f);
     [SerializeField] private int     difficulty           = 1;
@@ -21,9 +22,8 @@ public class GameController : MonoBehaviour {
 
     public static readonly string[] DEAD_MESSAGES = {"DIEDED", "DED", "X-X", "KAPUT", "OOF", " :( ", "N00B"};
 
-    // it ain't good, but leave it for now
+    // it ain't good, but leave it for now. Remember not to override directly.
     private State _gameState;
-    private float _playingTimer;
 
     // state switch and cleanup logic
     public State GameState {
@@ -33,19 +33,22 @@ public class GameController : MonoBehaviour {
             switch (_gameState) {
                 case State.WELCOME:
                     InputBuffer.enableActions(InputAction.RESTART);
-                    jumboText.enabled = true;
-                    jumboText.text    = "PRESS R";
+                    InputBuffer.disableActions(InputAction.DASH);
+                    playerController.animator.enabled = false;
+                    playerController.reset();
+                    mapController.reset();
+                    mapController.scrollSpeed = 0f;
+                    jumboText.enabled         = true;
+                    jumboText.text            = " <-R-> ";
+                    Time.timeScale            = playerController.audioSource.pitch = 1f;
                     break;
                 case State.PLAYING:
                     InputBuffer.enableActions(InputAction.DASH);
+                    InputBuffer.enableActions(InputAction.EXIT);
                     playerController.animator.enabled = true;
-                    _playingTimer                     = 0f;
-                    jumboText.enabled                 = false;
-                    mapController.scrollSpeed         = mapSpeed.x;
-                    mapController.obstacleDistance    = obstacleDistance.x;
-                    mapController.difficulty          = difficulty;
-                    mapController.reset();
                     playerController.reset();
+                    mapController.reset();
+                    jumboText.enabled = false;
                     break;
                 case State.DIED:
                     InputBuffer.disableActions(InputAction.DASH);
@@ -53,6 +56,7 @@ public class GameController : MonoBehaviour {
                     mapController.scrollSpeed         = 0f;
                     jumboText.enabled                 = true;
                     jumboText.text                    = DEAD_MESSAGES.OrderBy(_ => Guid.NewGuid()).First();
+                    Time.timeScale = playerController.audioSource.pitch = 1f;
                     break;
             }
         }
@@ -67,23 +71,27 @@ public class GameController : MonoBehaviour {
                     GameState = State.PLAYING;
                 break;
             case State.PLAYING:
-                // fast forward
-                playerController.animator.enabled =  true;
-                _playingTimer                     += Time.deltaTime;
+                // todo: phases should be grouped by difficulty after distance and speed + interval windup
+                if (mapController.DistanceTravelled < fastForwardDistance || Input.GetKey(KeyCode.UpArrow)) {
+                    Time.timeScale                     = fastForwardTimescale;
+                    playerController.audioSource.pitch = 1.2f;
+                } else {
+                    Time.timeScale = playerController.audioSource.pitch = 1f;
+                }
+
+                // exit during game
+                if (InputBuffer.pollAction(InputAction.EXIT)) {
+                    GameState = State.WELCOME;
+                    return;
+                }
 
                 // phase 1 - windup speed
-                mapController.scrollSpeed
-                    = Mathf.Lerp(mapSpeed.x, mapSpeed.y, _playingTimer / windupTime);
+                mapController.scrollSpeed = Mathf.Lerp(mapSpeed.x, mapSpeed.y,
+                                                       mapController.DistanceTravelled / windupDistance);
                 // phase 2 - windup object distance
-                mapController.obstacleDistance =
-                    Mathf.Lerp(obstacleDistance.x, obstacleDistance.y, (_playingTimer - windupTime) / windupTime);
+                mapController.obstacleDistance = Mathf.Lerp(obstacleDistance.x, obstacleDistance.y,
+                                                            mapController.DistanceTravelled / windupDistance - 1f);
                 mapController.difficulty = difficulty;
-
-                if (mapController.DistanceTravelled < fastForwardDistance) {
-                    Time.timeScale = fastForwardTimescale;
-                } else {
-                    Time.timeScale = 1f;
-                }
 
                 break;
             default: throw new ArgumentOutOfRangeException();

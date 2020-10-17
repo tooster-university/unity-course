@@ -8,6 +8,7 @@ using Object = System.Object;
 public enum InputAction {
     DASH,
     RESTART,
+    EXIT,
 }
 
 // http://kpulv.com/106/Jump_Input_Buffering/
@@ -26,6 +27,7 @@ public class InputBuffer : MonoBehaviour {
     // singleton
     protected static InputBuffer Instance { get; private set; }
 
+    // todo: fix InputSystem package not working on Linux 
     // returns true if action was read
     internal static bool peekAction(InputAction action) =>
         _enabledActions[(int) action]
@@ -64,12 +66,13 @@ public class InputBuffer : MonoBehaviour {
     }
 
     private void registerKeyDetectors() {
-        KeyDetectors += ClickDetector(KeyCode.LeftArrow, () => { register(InputAction.DASH, MoveDirection.Left); });
-        KeyDetectors += ClickDetector(KeyCode.RightArrow, () => { register(InputAction.DASH, MoveDirection.Right); });
-        KeyDetectors += ClickDetector(KeyCode.R, () => { register(InputAction.RESTART, MoveDirection.Left); });
+        KeyDetectors += actionStartedDetector(KeyCode.LeftArrow,  () => { markActionRegistered(InputAction.DASH, MoveDirection.Left); });
+        KeyDetectors += actionStartedDetector(KeyCode.RightArrow, () => { markActionRegistered(InputAction.DASH, MoveDirection.Right); });
+        KeyDetectors += actionStartedDetector(KeyCode.R, () => { markActionRegistered(InputAction.RESTART); });
+        KeyDetectors += actionStartedDetector(KeyCode.Escape, () => { markActionRegistered(InputAction.EXIT); });
     }
 
-    private Action ClickDetector(KeyCode keyCode, Action actionOnDetection) {
+    private Action actionStartedDetector(KeyCode keyCode, Action actionOnDetection) {
         var isPressed = false;
         return () => {
             if (Input.GetKeyUp(keyCode)) isPressed = false;
@@ -80,12 +83,10 @@ public class InputBuffer : MonoBehaviour {
         };
     }
 
-    private void register(InputAction action, object data) {
+    private void markActionRegistered(InputAction action, object data = null) {
         _actionTimers[(int) action] = _now;
         _actionData[(int) action]   = data;
     }
-
-    private void register(InputAction action) => register(action, null);
 
     private event Action KeyDetectors = () => { };
 

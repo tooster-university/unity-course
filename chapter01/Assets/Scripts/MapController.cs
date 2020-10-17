@@ -10,6 +10,8 @@ public class MapController : MonoBehaviour {
     [SerializeField] private GameObject      spawnpoints     = null;
     [SerializeField] private GameObject      ground          = null;
     [SerializeField] private GameObject      obstacles       = null;
+    [SerializeField] private LifePickup      lifePrefab      = null;
+    [SerializeField] private float           lifeInterval    = 500f;
     [SerializeField] private Obstacle[]      obstaclePrefabs = null;
 
     [NonSerialized] public float scrollSpeed      = 0f;
@@ -18,9 +20,10 @@ public class MapController : MonoBehaviour {
 
     public float DistanceTravelled { get; private set; }
 
-    private Material _groundMaterial    = null;
-    private float    _lastSpawnDistance = 0f;
-    private int      _highscore         = 0;
+    private Material _groundMaterial        = null;
+    private float    _lastSpawnDistance     = 0f;
+    private float    _lastLifeSpawnDistance = 0f;
+    private int      _highscore             = 0;
 
 
     private static readonly Vector3 MOTION_VECTOR = Vector3.back;
@@ -29,8 +32,9 @@ public class MapController : MonoBehaviour {
     private static readonly Color   GOLD_COLOR    = new Color(0xFF / 255f, 0xA9 / 255f, 0x00 / 255f);
 
     public void reset() {
-        DistanceTravelled  = 0f;
-        _lastSpawnDistance = -obstacleDistance;          // to make it spawn in first frame
+        DistanceTravelled      = 0f;
+        _lastSpawnDistance     = -obstacleDistance; // to make it spawn in first frame
+        _lastLifeSpawnDistance = 0f;
         foreach (Transform child in obstacles.transform) // cleanup
             Destroy(child.gameObject);
         scoreText.color = NORMAL_COLOR;
@@ -43,7 +47,7 @@ public class MapController : MonoBehaviour {
     }
 
     void Update() {
-        spawnBarrels();
+        spawnNextLayer();
 
         scrollMap();
 
@@ -65,34 +69,40 @@ public class MapController : MonoBehaviour {
 
         // move obstacles and destroy if needed
         foreach (Transform obstacle in obstacles.transform) {
-            obstacle.position += MOTION_VECTOR * (scrollSpeed * Time.deltaTime);
+            obstacle.GetComponent<Rigidbody>().MovePosition(obstacle.transform.position + MOTION_VECTOR * (scrollSpeed * Time.deltaTime));
+            // obstacle.transform.position += MOTION_VECTOR * (scrollSpeed * Time.deltaTime);
 
             if (!mapBounds.bounds.Contains(obstacle.position))
                 Destroy(obstacle.gameObject);
         }
     }
 
-    private void spawnBarrels() {
+    private void spawnNextLayer() {
         if (DistanceTravelled - _lastSpawnDistance < obstacleDistance)
             return;
 
         _lastSpawnDistance = DistanceTravelled;
 
-        var childCount = spawnpoints.transform.childCount;
+        var lanes = spawnpoints.transform.childCount;
 
         // roll maximum number of barrels scaled with difficulty
-        int obstaclesToSpawn = Random.Range(0, Math.Min(difficulty, childCount - 1));
+        int obstaclesToSpawn = Random.Range(1, lanes);
         if (difficulty > 1)
-            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(0, Math.Min(difficulty, childCount - 1)));
+            obstaclesToSpawn = Random.Range(obstaclesToSpawn, difficulty);
         if (difficulty > 2)
-            obstaclesToSpawn = Math.Max(obstaclesToSpawn, Random.Range(0, Math.Min(difficulty, childCount - 1)));
-
+            obstaclesToSpawn = Random.Range(obstaclesToSpawn, difficulty);
 
         // for random indexes in spawnpoints spawn obstacles
-        foreach (var idx in Enumerable.Range(0, childCount).OrderBy(x => Guid.NewGuid()).Take(obstaclesToSpawn)) {
-            var prefabIdx = Random.Range(0, obstaclePrefabs.Length);
-            var obstacle = Instantiate(obstaclePrefabs[prefabIdx].gameObject,
-                                       spawnpoints.transform.GetChild(idx).position,
+        foreach (var laneIdx in Enumerable.Range(0, lanes).OrderBy(x => Guid.NewGuid()).Take(obstaclesToSpawn)) {
+            // random obstacle
+            Obstacle laneElement = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Length)];
+            if (DistanceTravelled - _lastLifeSpawnDistance >= lifeInterval) {
+                _lastLifeSpawnDistance = DistanceTravelled;
+                laneElement            = lifePrefab;
+            }
+
+            var obstacle = Instantiate(laneElement.gameObject,
+                                       spawnpoints.transform.GetChild(laneIdx).position,
                                        Quaternion.identity,
                                        obstacles.transform);
         }

@@ -3,7 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour {
     [SerializeField] private bool            godMode    = false;
     [SerializeField] private TextMeshProUGUI lifesText  = null;
@@ -12,38 +13,44 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private AudioClip       jumpSound  = null;
     [SerializeField] private AudioClip       crashSound = null;
     [SerializeField] private AudioClip       dieSound   = null;
+    [SerializeField] private AudioClip       healSound  = null;
 
-    [NonSerialized] public Animator animator;
+    [NonSerialized] public Animator    animator;
+    [NonSerialized] public AudioSource audioSource;
+    private                Rigidbody   _rigidbody;
+
 
     public float                          dashDuration = 0.1f;
     public event Action<PlayerController> PlayerDied;
 
+    private static readonly int START_LIFES = 3;
+    private static readonly int MAX_LIFES   = 6;
 
-    private Rigidbody _rigidbody;
-    private float     _dashTimer = 0.0f;
-    private int       _lifes     = 3;
-    private int       _currentLane;
-    private int       _targetLane;
+    private float _dashTimer = 0.0f;
+    private int   _lifes     = START_LIFES;
+    private int   _currentLane;
+    private int   _targetLane;
+
+    private void Awake() {
+        animator    = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        _rigidbody  = GetComponent<Rigidbody>();
+        reset();
+    }
 
     private int Lifes {
         get => _lifes;
         set {
-            _lifes         = Math.Max(0, value);
+            _lifes         = Mathf.Clamp(value, 0, MAX_LIFES);
             lifesText.text = new string('#', _lifes);
         }
     }
 
     public void reset() {
         transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        _dashTimer       = 0f;
-        Lifes            = 3;
-        _currentLane     = _targetLane = lanes.transform.childCount / 2; // middle lane
-    }
-
-    private void Awake() {
-        animator   = GetComponent<Animator>();
-        _rigidbody = GetComponent<Rigidbody>();
-        reset();
+        _dashTimer   = 0f;
+        Lifes        = START_LIFES;
+        _currentLane = _targetLane = lanes.transform.childCount / 2; // middle lane
     }
 
     private void FixedUpdate() {
@@ -56,7 +63,8 @@ public class PlayerController : MonoBehaviour {
                 _currentLane = _targetLane;
             }
         } else if (_dashTimer == 0f && InputBuffer.pollAction(InputAction.DASH)) {
-            AudioSource.PlayClipAtPoint(dashSound, transform.position);
+            audioSource.clip = dashSound;
+            audioSource.Play();
             _dashTimer += Time.fixedDeltaTime;
             // if not dashing, and polling resulted in dash
             var direction = (MoveDirection) InputBuffer.getData(InputAction.DASH);
@@ -74,18 +82,23 @@ public class PlayerController : MonoBehaviour {
         var endPos   = startPos;
         startPos.x = lanes.transform.GetChild(_currentLane).transform.position.x;
         endPos.x   = lanes.transform.GetChild(_targetLane).transform.position.x;
-        _rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, _dashTimer / dashDuration));
+        _rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, Mathf.Clamp(_dashTimer / dashDuration, 0f, 1f)));
     }
 
     public void takeDamage(int damage) {
         if (!godMode) Lifes -= damage;
         if (Lifes == 0) {
-            AudioSource.PlayClipAtPoint(dieSound, transform.position);
+            audioSource.clip = dieSound;
             PlayerDied?.Invoke(this);
         } else {
-            AudioSource.PlayClipAtPoint(crashSound, transform.position);
+            audioSource.clip = damage > 0 ? crashSound : healSound;
         }
+
+        audioSource.Play();
     }
 
-    public void playJumpSound() { AudioSource.PlayClipAtPoint(jumpSound, transform.position); }
+    public void playJumpSound() {
+        audioSource.clip = jumpSound;
+        audioSource.Play();
+    }
 }
