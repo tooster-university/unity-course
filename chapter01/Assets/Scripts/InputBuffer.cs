@@ -9,6 +9,7 @@ public enum InputAction {
     DASH,
     RESTART,
     EXIT,
+    CHANGE_DIFFICULTY,
 }
 
 // http://kpulv.com/106/Jump_Input_Buffering/
@@ -70,6 +71,8 @@ public class InputBuffer : MonoBehaviour {
         KeyDetectors += actionStartedDetector(KeyCode.RightArrow, () => { markActionRegistered(InputAction.DASH, MoveDirection.Right); });
         KeyDetectors += actionStartedDetector(KeyCode.R, () => { markActionRegistered(InputAction.RESTART); });
         KeyDetectors += actionStartedDetector(KeyCode.Escape, () => { markActionRegistered(InputAction.EXIT); });
+        KeyDetectors += actionStartedDetector(KeyCode.Space, () => { markActionRegistered(InputAction.CHANGE_DIFFICULTY); });
+        KeyDetectors += actionStartedDetector(KeyCode.Q, () => { Application.Quit(0); });
     }
 
     private Action actionStartedDetector(KeyCode keyCode, Action actionOnDetection) {

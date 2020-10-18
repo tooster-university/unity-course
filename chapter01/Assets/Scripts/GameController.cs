@@ -4,23 +4,25 @@ using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class GameController : MonoBehaviour {
-    public MapController    mapController    = null;
-    public PlayerController playerController = null;
-    public TextMeshProUGUI  jumboText        = null;
+public enum State { WELCOME, PLAYING, DIED }
 
-    [SerializeField] private float   windupDistance       = 300;
-    [SerializeField] private Vector2 mapSpeed             = new Vector2(2f, 10f);
-    [SerializeField] private Vector2 obstacleDistance     = new Vector2(10f, 2f);
-    [SerializeField] private int     difficulty           = 1;
-    [SerializeField] private float   fastForwardDistance  = 30f;
-    [SerializeField] private float   fastForwardTimescale = 10f;
+
+public class GameController : MonoBehaviour {
+    public MapController    mapController        = null;
+    public PlayerController playerController     = null;
+    public TextMeshProUGUI  jumboText            = null;
+    public TextMeshProUGUI  fastForwardIndicator = null;
+
+    [SerializeField] private float     fastForwardDistance  = 30f;
+    [SerializeField] private float     fastForwardTimescale = 10f;
+    [SerializeField] private float     fastForwardPitch     = 1.2f;
+    [SerializeField] private bool      canSlowDown          = false;
+    [SerializeField] private AudioClip gameOverSound        = null;
 
     public static GameController Instance { get; private set; }
 
-    public enum State { WELCOME, PLAYING, DIED }
+    public static readonly string[] DEAD_MESSAGES = {"DIEDED", "DED", "x_x", "KAPUT", "OOF", " :( ", "GIT GUD", "BOOO"};
 
-    public static readonly string[] DEAD_MESSAGES = {"DIEDED", "DED", "X-X", "KAPUT", "OOF", " :( ", "N00B"};
 
     // it ain't good, but leave it for now. Remember not to override directly.
     private State _gameState;
@@ -32,31 +34,34 @@ public class GameController : MonoBehaviour {
             _gameState = value;
             switch (_gameState) {
                 case State.WELCOME:
-                    InputBuffer.enableActions(InputAction.RESTART);
+                    InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
                     InputBuffer.disableActions(InputAction.DASH);
                     playerController.animator.enabled = false;
                     playerController.reset();
                     mapController.reset();
-                    mapController.scrollSpeed = 0f;
-                    jumboText.enabled         = true;
-                    jumboText.text            = " <-R-> ";
-                    Time.timeScale            = playerController.audioSource.pitch = 1f;
+                    mapController.displayHighscore();
+                    jumboText.enabled = true;
+                    jumboText.text    = " R ";
+                    Time.timeScale    = playerController.audioSource.pitch = 1f;
                     break;
                 case State.PLAYING:
-                    InputBuffer.enableActions(InputAction.DASH);
-                    InputBuffer.enableActions(InputAction.EXIT);
-                    playerController.animator.enabled = true;
+                    InputBuffer.enableActions(InputAction.DASH, InputAction.EXIT);
+                    InputBuffer.disableActions(InputAction.CHANGE_DIFFICULTY);
                     playerController.reset();
                     mapController.reset();
-                    jumboText.enabled = false;
+                    mapController.Running             = true;
+                    playerController.animator.enabled = true;
+                    jumboText.enabled                 = false;
                     break;
                 case State.DIED:
+                    InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
                     InputBuffer.disableActions(InputAction.DASH);
                     playerController.animator.enabled = false;
-                    mapController.scrollSpeed         = 0f;
+                    mapController.Running             = false;
                     jumboText.enabled                 = true;
                     jumboText.text                    = DEAD_MESSAGES.OrderBy(_ => Guid.NewGuid()).First();
-                    Time.timeScale = playerController.audioSource.pitch = 1f;
+                    Time.timeScale                    = playerController.audioSource.pitch = 1f;
+                    playerController.audioSource.PlayOneShot(gameOverSound);
                     break;
             }
         }
@@ -64,37 +69,36 @@ public class GameController : MonoBehaviour {
 
     void Update() {
         switch (GameState) {
-            case State.WELCOME: goto restart;
+            case State.WELCOME:
+                goto pauseScreen;
             case State.DIED:
-                restart:
+                // exit during game
+                if (InputBuffer.pollAction(InputAction.EXIT)) GameState = State.WELCOME;
+
+                pauseScreen:
+
                 if (InputBuffer.pollAction(InputAction.RESTART))
                     GameState = State.PLAYING;
                 break;
+
             case State.PLAYING:
-                // todo: phases should be grouped by difficulty after distance and speed + interval windup
+
+                // timescale manipulation
                 if (mapController.DistanceTravelled < fastForwardDistance || Input.GetKey(KeyCode.UpArrow)) {
+                    fastForwardIndicator.enabled       = true;
                     Time.timeScale                     = fastForwardTimescale;
-                    playerController.audioSource.pitch = 1.2f;
+                    playerController.audioSource.pitch = fastForwardPitch;
+                } else if (canSlowDown && Input.GetKey(KeyCode.DownArrow)) {
+                    Time.timeScale = playerController.audioSource.pitch = 0.5f; // WIP 
                 } else {
-                    Time.timeScale = playerController.audioSource.pitch = 1f;
+                    fastForwardIndicator.enabled = false;
+                    Time.timeScale               = playerController.audioSource.pitch = 1f;
                 }
 
                 // exit during game
-                if (InputBuffer.pollAction(InputAction.EXIT)) {
-                    GameState = State.WELCOME;
-                    return;
-                }
-
-                // phase 1 - windup speed
-                mapController.scrollSpeed = Mathf.Lerp(mapSpeed.x, mapSpeed.y,
-                                                       mapController.DistanceTravelled / windupDistance);
-                // phase 2 - windup object distance
-                mapController.obstacleDistance = Mathf.Lerp(obstacleDistance.x, obstacleDistance.y,
-                                                            mapController.DistanceTravelled / windupDistance - 1f);
-                mapController.difficulty = difficulty;
+                if (InputBuffer.pollAction(InputAction.EXIT)) GameState = State.WELCOME;
 
                 break;
-            default: throw new ArgumentOutOfRangeException();
         }
     }
 

@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private AudioClip       dashSound  = null;
     [SerializeField] private AudioClip       jumpSound  = null;
     [SerializeField] private AudioClip       crashSound = null;
-    [SerializeField] private AudioClip       dieSound   = null;
     [SerializeField] private AudioClip       healSound  = null;
 
     [NonSerialized] public Animator    animator;
@@ -63,8 +62,7 @@ public class PlayerController : MonoBehaviour {
                 _currentLane = _targetLane;
             }
         } else if (_dashTimer == 0f && InputBuffer.pollAction(InputAction.DASH)) {
-            audioSource.clip = dashSound;
-            audioSource.Play();
+            audioSource.PlayOneShot(dashSound);
             _dashTimer += Time.fixedDeltaTime;
             // if not dashing, and polling resulted in dash
             var direction = (MoveDirection) InputBuffer.getData(InputAction.DASH);
@@ -87,18 +85,12 @@ public class PlayerController : MonoBehaviour {
 
     public void takeDamage(int damage) {
         if (!godMode) Lifes -= damage;
-        if (Lifes == 0) {
-            audioSource.clip = dieSound;
+        audioSource.PlayOneShot(damage > 0 ? crashSound : healSound);
+        if (Lifes == 0)
             PlayerDied?.Invoke(this);
-        } else {
-            audioSource.clip = damage > 0 ? crashSound : healSound;
-        }
-
-        audioSource.Play();
     }
 
     public void playJumpSound() {
-        audioSource.clip = jumpSound;
-        audioSource.Play();
+        audioSource.PlayOneShot(jumpSound);
     }
 }
