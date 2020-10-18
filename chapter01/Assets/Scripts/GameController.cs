@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -21,7 +22,10 @@ public class GameController : MonoBehaviour {
 
     public static GameController Instance { get; private set; }
 
-    public static readonly string[] DEAD_MESSAGES = {"DIEDED", "DED", "x_x", "KAPUT", "OOF", " :( ", "GIT GUD", "BOOO"};
+    public static readonly string[] DEAD_MESSAGES =
+    {
+        "DIEDED", "DED", "x_x", "KAPUT", "OOF", " :( ", "GIT GUD", "...", "XD", "U MAD?", "FACEPALM",
+    };
 
 
     // it ain't good, but leave it for now. Remember not to override directly.
@@ -40,9 +44,10 @@ public class GameController : MonoBehaviour {
                     playerController.reset();
                     mapController.reset();
                     mapController.displayHighscore();
-                    jumboText.enabled = true;
-                    jumboText.text    = " R ";
-                    Time.timeScale    = playerController.audioSource.pitch = 1f;
+                    jumboText.enabled            = true;
+                    jumboText.text               = "SPACE";
+                    fastForwardIndicator.enabled = false;
+                    Time.timeScale               = playerController.audioSource.pitch = 1f;
                     break;
                 case State.PLAYING:
                     InputBuffer.enableActions(InputAction.DASH, InputAction.EXIT);
@@ -60,6 +65,7 @@ public class GameController : MonoBehaviour {
                     mapController.Running             = false;
                     jumboText.enabled                 = true;
                     jumboText.text                    = DEAD_MESSAGES.OrderBy(_ => Guid.NewGuid()).First();
+                    fastForwardIndicator.enabled      = false;
                     Time.timeScale                    = playerController.audioSource.pitch = 1f;
                     playerController.audioSource.PlayOneShot(gameOverSound);
                     break;
@@ -109,6 +115,9 @@ public class GameController : MonoBehaviour {
         } else {
             Destroy(this);
         }
+
+        Cursor.visible   = false;
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     // Start is called before the first frame update

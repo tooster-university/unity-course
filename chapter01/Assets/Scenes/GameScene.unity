@@ -1219,7 +1219,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: U MAD?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -1576,9 +1576,9 @@ MonoBehaviour:
   m_DeadZoneHeight: 0.04369863
   m_DeadZoneDepth: 0
   m_UnlimitedSoftZone: 0
-  m_SoftZoneWidth: 0.15223561
+  m_SoftZoneWidth: 0.454977
   m_SoftZoneHeight: 0.14109704
-  m_BiasX: -0.0000037295436
+  m_BiasX: -0.0000007052059
   m_BiasY: 0
   m_CenterOnActivate: 1
   m_GroupFramingMode: 2

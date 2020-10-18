@@ -69,9 +69,9 @@ public class InputBuffer : MonoBehaviour {
     private void registerKeyDetectors() {
         KeyDetectors += actionStartedDetector(KeyCode.LeftArrow,  () => { markActionRegistered(InputAction.DASH, MoveDirection.Left); });
         KeyDetectors += actionStartedDetector(KeyCode.RightArrow, () => { markActionRegistered(InputAction.DASH, MoveDirection.Right); });
-        KeyDetectors += actionStartedDetector(KeyCode.R, () => { markActionRegistered(InputAction.RESTART); });
+        KeyDetectors += actionStartedDetector(KeyCode.Space, () => { markActionRegistered(InputAction.RESTART); });
         KeyDetectors += actionStartedDetector(KeyCode.Escape, () => { markActionRegistered(InputAction.EXIT); });
-        KeyDetectors += actionStartedDetector(KeyCode.Space, () => { markActionRegistered(InputAction.CHANGE_DIFFICULTY); });
+        KeyDetectors += actionStartedDetector(KeyCode.Return, () => { markActionRegistered(InputAction.CHANGE_DIFFICULTY); });
         KeyDetectors += actionStartedDetector(KeyCode.Q, () => { Application.Quit(0); });
     }
 
