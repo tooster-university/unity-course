@@ -14,11 +14,11 @@ public class Timer : MonoBehaviour {
     public float Count {
         get => _count;
         set {
-            _count             = value;
-            if(_timerText) _timerText.text    = Count.ToString("F2");
+            _count = value;
+            if (_timerText) _timerText.text = Count.ToString("F2");
         }
     }
-    
+
     void Awake() {
         Count      = 0;
         _timerText = GetComponent<TextMeshPro>();
