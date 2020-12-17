@@ -1,18 +1,23 @@
 ﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.PostProcessing;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour {
-    [SerializeField] private bool            godMode    = false;
-    [SerializeField] private TextMeshProUGUI lifesText  = null;
-    [SerializeField] private GameObject      lanes      = null; // keeps children with lanes to swap onto
-    [SerializeField] private AudioClip       dashSound  = null;
-    [SerializeField] private AudioClip       jumpSound  = null;
-    [SerializeField] private AudioClip       crashSound = null;
-    [SerializeField] private AudioClip       healSound  = null;
+    [SerializeField] private bool            godMode       = false;
+    [SerializeField] private TextMeshProUGUI lifesText     = null;
+    [SerializeField] private GameObject      lanes         = null; // keeps children with lanes to swap onto
+    [SerializeField] private AudioClip       dashSound     = null;
+    [SerializeField] private AudioClip       jumpSound     = null;
+    [SerializeField] private AudioClip       crashSound    = null;
+    [SerializeField] private AudioClip       healSound     = null;
+    [SerializeField] private ParticleSystem  dashParticles = null;
+
+    [SerializeField] private Color vignetteDamage = Color.red;
 
     [NonSerialized] public Animator    animator;
     [NonSerialized] public AudioSource audioSource;
@@ -25,10 +30,11 @@ public class PlayerController : MonoBehaviour {
     private static readonly int START_LIFES = 3;
     private static readonly int MAX_LIFES   = 6;
 
-    private float _dashTimer = 0.0f;
-    private int   _lifes     = START_LIFES;
-    private int   _currentLane;
-    private int   _targetLane;
+    private float          _dashTimer = 0.0f;
+    private int            _lifes     = START_LIFES;
+    private int            _currentLane;
+    private int            _targetLane;
+    private ParticleSystem _dashParticles;
 
     private void Awake() {
         animator    = GetComponent<Animator>();
@@ -52,6 +58,20 @@ public class PlayerController : MonoBehaviour {
         _currentLane = _targetLane = lanes.transform.childCount / 2; // middle lane
     }
 
+    public void PlayerStart() {
+        animator.enabled = true;
+        audioSource.Play();
+        _dashParticles   = Instantiate(dashParticles, gameObject.transform);
+    }
+
+    public void PlayerStop() {
+        animator.enabled = false;
+        audioSource.Stop();
+        if(_dashParticles != null)
+            Destroy(_dashParticles);
+
+    }
+
     private void FixedUpdate() {
         // if dashing
         if (_dashTimer > 0f) {
@@ -62,7 +82,7 @@ public class PlayerController : MonoBehaviour {
                 _currentLane = _targetLane;
             }
         } else if (_dashTimer == 0f && InputBuffer.pollAction(InputAction.DASH)) {
-            audioSource.PlayOneShot(dashSound);
+            audioSource.PlayOneShot(dashSound, 0.2f);
             _dashTimer += Time.fixedDeltaTime;
             // if not dashing, and polling resulted in dash
             var direction = (MoveDirection) InputBuffer.getData(InputAction.DASH);
@@ -85,12 +105,13 @@ public class PlayerController : MonoBehaviour {
 
     public void takeDamage(int damage) {
         if (!godMode) Lifes -= damage;
-        audioSource.PlayOneShot(damage > 0 ? crashSound : healSound);
-        if (Lifes == 0)
+        audioSource.PlayOneShot(damage > 0 ? crashSound : healSound, 0.5f);
+        GameController.Instance.postProcessingController.VignetteBurst(vignetteDamage);
+        if (Lifes == 0) {
+            PlayerStop();
             PlayerDied?.Invoke(this);
+        }
     }
 
-    public void playJumpSound() {
-        audioSource.PlayOneShot(jumpSound);
-    }
+    public void playJumpSound() { audioSource.PlayOneShot(jumpSound, 0.1f); }
 }

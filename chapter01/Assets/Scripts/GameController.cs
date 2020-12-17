@@ -9,10 +9,11 @@ public enum State { WELCOME, PLAYING, DIED }
 
 
 public class GameController : MonoBehaviour {
-    public MapController    mapController        = null;
-    public PlayerController playerController     = null;
-    public TextMeshProUGUI  jumboText            = null;
-    public TextMeshProUGUI  fastForwardIndicator = null;
+    public MapController            mapController            = null;
+    public PlayerController         playerController         = null;
+    public TextMeshProUGUI          jumboText                = null;
+    public TextMeshProUGUI          fastForwardIndicator     = null;
+    public PostProcessingController postProcessingController = null;
 
     [SerializeField] private float     fastForwardDistance  = 30f;
     [SerializeField] private float     fastForwardTimescale = 10f;
@@ -40,8 +41,8 @@ public class GameController : MonoBehaviour {
                 case State.WELCOME:
                     InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
                     InputBuffer.disableActions(InputAction.DASH);
-                    playerController.animator.enabled = false;
                     playerController.reset();
+                    playerController.PlayerStop();
                     mapController.reset();
                     mapController.displayHighscore();
                     jumboText.enabled            = true;
@@ -53,20 +54,20 @@ public class GameController : MonoBehaviour {
                     InputBuffer.enableActions(InputAction.DASH, InputAction.EXIT);
                     InputBuffer.disableActions(InputAction.CHANGE_DIFFICULTY);
                     playerController.reset();
+                    playerController.PlayerStart();
                     mapController.reset();
                     mapController.Running             = true;
-                    playerController.animator.enabled = true;
-                    jumboText.enabled                 = false;
+                    jumboText.enabled = false;
                     break;
                 case State.DIED:
                     InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
                     InputBuffer.disableActions(InputAction.DASH);
-                    playerController.animator.enabled = false;
-                    mapController.Running             = false;
-                    jumboText.enabled                 = true;
-                    jumboText.text                    = DEAD_MESSAGES.OrderBy(_ => Guid.NewGuid()).First();
-                    fastForwardIndicator.enabled      = false;
-                    Time.timeScale                    = playerController.audioSource.pitch = 1f;
+                    playerController.PlayerStop();
+                    mapController.Running        = false;
+                    jumboText.enabled            = true;
+                    jumboText.text               = DEAD_MESSAGES.OrderBy(_ => Guid.NewGuid()).First();
+                    fastForwardIndicator.enabled = false;
+                    Time.timeScale               = playerController.audioSource.pitch = 1f;
                     playerController.audioSource.PlayOneShot(gameOverSound);
                     break;
             }
@@ -122,7 +123,7 @@ public class GameController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        playerController.PlayerDied += pc => GameState = State.DIED;
+        playerController.PlayerDied += pc => { GameState = State.DIED; };
         GameState                   =  State.WELCOME;
     }
 }

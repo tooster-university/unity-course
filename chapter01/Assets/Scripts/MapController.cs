@@ -18,6 +18,7 @@ public class MapController : MonoBehaviour {
     [SerializeField]        private GameObject      ground          = null;
     [SerializeField]        private LifePickup      lifePrefab      = null;
     [SerializeField]        private Obstacle[]      obstaclePrefabs = null;
+    [SerializeField]        private Color           difficultyVignetteColor;
 
 
     public TextMeshProUGUI scoreText = null;
@@ -85,7 +86,7 @@ public class MapController : MonoBehaviour {
         }
 
         if (!Running) return;
-        
+
         if (DistanceTravelled >= _highscore) {
             _highscore = DistanceTravelled;
             displayHighscore();
@@ -100,7 +101,11 @@ public class MapController : MonoBehaviour {
         _obstacleDistance = Mathf.Lerp(obstacleDistanceRange.x, obstacleDistanceRange.y,
                                        DistanceTravelled / windupDistance);
         //     phase 3 - change difficulty between 1-5
-        Difficulty = _initialDifficulty + (int) (DistanceTravelled / difficultyThreshold);
+        var newDifficulty = _initialDifficulty + (int) (DistanceTravelled / difficultyThreshold);
+        if (newDifficulty != Difficulty) {
+            Difficulty = newDifficulty;
+            GameController.Instance.postProcessingController.VignetteBurst(difficultyVignetteColor);
+        }
     }
 
     private void scrollMap() {
