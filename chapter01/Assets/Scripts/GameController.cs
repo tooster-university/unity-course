@@ -25,7 +25,7 @@ public class GameController : MonoBehaviour {
 
     public static readonly string[] DEAD_MESSAGES =
     {
-        "DIEDED", "DED", "x_x", "KAPUT", "OOF", " :( ", "GIT GUD", "...", "XD", "U MAD?", "FACEPALM",
+        "DIEDED", "DED", "x_x", "KAPUT", "OOF", " :( ", "GIT GUD", "...", "XD", "U MAD?", "FACEPALM", "R.I.P", "K.I.A", "LOL", "KEKW", "DUDE...", "._."
     };
 
 
@@ -40,7 +40,7 @@ public class GameController : MonoBehaviour {
             switch (_gameState) {
                 case State.WELCOME:
                     InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
-                    InputBuffer.disableActions(InputAction.DASH);
+                    InputBuffer.disableActions(InputAction.DASH, InputAction.CHANGE_LANE);
                     playerController.reset();
                     playerController.PlayerStop();
                     mapController.reset();
@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour {
                     Time.timeScale               = playerController.audioSource.pitch = 1f;
                     break;
                 case State.PLAYING:
-                    InputBuffer.enableActions(InputAction.DASH, InputAction.EXIT);
+                    InputBuffer.enableActions(InputAction.DASH, InputAction.EXIT, InputAction.CHANGE_LANE);
                     InputBuffer.disableActions(InputAction.CHANGE_DIFFICULTY);
                     playerController.reset();
                     playerController.PlayerStart();
@@ -61,7 +61,7 @@ public class GameController : MonoBehaviour {
                     break;
                 case State.DIED:
                     InputBuffer.enableActions(InputAction.RESTART, InputAction.CHANGE_DIFFICULTY);
-                    InputBuffer.disableActions(InputAction.DASH);
+                    InputBuffer.disableActions(InputAction.DASH, InputAction.CHANGE_LANE);
                     playerController.PlayerStop();
                     mapController.Running        = false;
                     jumboText.enabled            = true;
@@ -80,22 +80,23 @@ public class GameController : MonoBehaviour {
                 goto pauseScreen;
             case State.DIED:
                 // exit during game
-                if (InputBuffer.pollAction(InputAction.EXIT)) GameState = State.WELCOME;
+                if (InputBuffer.pollAction(InputAction.EXIT) != null) GameState = State.WELCOME;
 
                 pauseScreen:
 
-                if (InputBuffer.pollAction(InputAction.RESTART))
+                if (InputBuffer.pollAction(InputAction.RESTART) != null)
                     GameState = State.PLAYING;
                 break;
 
             case State.PLAYING:
 
                 // timescale manipulation
-                if (mapController.DistanceTravelled < fastForwardDistance || Input.GetKey(KeyCode.UpArrow)) {
+                // yeah, the input handling should be separated somewhere but this project is too small to bother
+                if (mapController.DistanceTravelled < fastForwardDistance || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.L)) {
                     fastForwardIndicator.enabled       = true;
                     Time.timeScale                     = fastForwardTimescale;
                     playerController.audioSource.pitch = fastForwardPitch;
-                } else if (canSlowDown && Input.GetKey(KeyCode.DownArrow)) {
+                } else if (canSlowDown && (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.L))) {
                     Time.timeScale = playerController.audioSource.pitch = 0.5f; // WIP 
                 } else {
                     fastForwardIndicator.enabled = false;
@@ -103,7 +104,7 @@ public class GameController : MonoBehaviour {
                 }
 
                 // exit during game
-                if (InputBuffer.pollAction(InputAction.EXIT)) GameState = State.WELCOME;
+                if (InputBuffer.pollAction(InputAction.EXIT) != null) GameState = State.WELCOME;
 
                 break;
         }

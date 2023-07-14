@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private ParticleSystem  dashParticles = null;
 
     [SerializeField] private Color vignetteDamage = Color.red;
+    [SerializeField] private Color vignetteHeal   = Color.green;
 
     [NonSerialized] public Animator    animator;
     [NonSerialized] public AudioSource audioSource;
@@ -37,39 +38,38 @@ public class PlayerController : MonoBehaviour {
     private ParticleSystem _dashParticles;
 
     private void Awake() {
-        animator    = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        _rigidbody  = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
         reset();
     }
 
     private int Lifes {
         get => _lifes;
         set {
-            _lifes         = Mathf.Clamp(value, 0, MAX_LIFES);
+            _lifes = Mathf.Clamp(value, 0, MAX_LIFES);
             lifesText.text = new string('#', _lifes);
         }
     }
 
     public void reset() {
         transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        _dashTimer   = 0f;
-        Lifes        = START_LIFES;
+        _dashTimer = 0f;
+        Lifes = START_LIFES;
         _currentLane = _targetLane = lanes.transform.childCount / 2; // middle lane
     }
 
     public void PlayerStart() {
         animator.enabled = true;
         audioSource.Play();
-        _dashParticles   = Instantiate(dashParticles, gameObject.transform);
+        _dashParticles = Instantiate(dashParticles, gameObject.transform);
     }
 
     public void PlayerStop() {
         animator.enabled = false;
         audioSource.Stop();
-        if(_dashParticles != null)
+        if (_dashParticles != null)
             Destroy(_dashParticles);
-
     }
 
     private void FixedUpdate() {
@@ -78,35 +78,45 @@ public class PlayerController : MonoBehaviour {
             _dashTimer += Time.fixedDeltaTime;
             // if dash ended
             if (_dashTimer >= dashDuration) {
-                _dashTimer   = 0f;
+                _dashTimer = 0f;
                 _currentLane = _targetLane;
             }
-        } else if (_dashTimer == 0f && InputBuffer.pollAction(InputAction.DASH)) {
-            audioSource.PlayOneShot(dashSound, 0.2f);
-            _dashTimer += Time.fixedDeltaTime;
-            // if not dashing, and polling resulted in dash
-            var direction = (MoveDirection) InputBuffer.getData(InputAction.DASH);
-            if (direction is MoveDirection.Left)
-                --_targetLane;
-            else if (direction is MoveDirection.Right)
-                ++_targetLane;
-            else Debug.LogError("DASH action data invalid.");
 
-            _targetLane = Mathf.Clamp(_targetLane, 0, lanes.transform.childCount - 1); // lane arg in bounds 
+        } else if (_dashTimer == 0f) {
+            var action = InputBuffer.pollAction(InputAction.DASH) ?? InputBuffer.pollAction(InputAction.CHANGE_LANE);
+            if (action != null) {
+                audioSource.PlayOneShot(dashSound, 0.2f);
+                _dashTimer += Time.fixedDeltaTime;
+                if (action == InputAction.CHANGE_LANE) {
+                    _targetLane = (int)InputBuffer.getData(InputAction.CHANGE_LANE);
+                } else {
+                    var direction = (MoveDirection)InputBuffer.getData(InputAction.DASH);
+                    if (direction is MoveDirection.Left)
+                        --_targetLane;
+                    else if (direction is MoveDirection.Right)
+                        ++_targetLane;
+                    else Debug.LogError("DASH action data invalid.");
+
+                    _targetLane = Mathf.Clamp(_targetLane, 0, lanes.transform.childCount - 1);
+                }
+            }
         }
 
         // lerp positions with elastic bounce out
         var startPos = transform.position;
-        var endPos   = startPos;
+        var endPos = startPos;
         startPos.x = lanes.transform.GetChild(_currentLane).transform.position.x;
-        endPos.x   = lanes.transform.GetChild(_targetLane).transform.position.x;
+        endPos.x = lanes.transform.GetChild(_targetLane).transform.position.x;
         _rigidbody.MovePosition(Vector3.Lerp(startPos, endPos, Mathf.Clamp(_dashTimer / dashDuration, 0f, 1f)));
     }
 
     public void takeDamage(int damage) {
         if (!godMode) Lifes -= damage;
-        audioSource.PlayOneShot(damage > 0 ? crashSound : healSound, 0.5f);
-        GameController.Instance.postProcessingController.VignetteBurst(vignetteDamage);
+        var sound = damage > 0 ? crashSound : healSound;
+        var volume = damage > 0 ? 1f : 0.5f;
+        var vignetteColor = damage > 0 ? vignetteDamage : vignetteHeal;
+        audioSource.PlayOneShot(sound, volume);
+        GameController.Instance.postProcessingController.VignetteBurst(vignetteColor);
         if (Lifes == 0) {
             PlayerStop();
             PlayerDied?.Invoke(this);

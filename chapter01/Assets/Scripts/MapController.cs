@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -15,6 +17,7 @@ public class MapController : MonoBehaviour {
     [SerializeField]        private TextMeshProUGUI difficultyText  = null;
     [SerializeField]        private BoxCollider     mapBounds       = null;
     [SerializeField]        private GameObject      spawnpoints     = null;
+    [SerializeField]        private float           appearanceDuration = 1f;
     [SerializeField]        private GameObject      ground          = null;
     [SerializeField]        private LifePickup      lifePrefab      = null;
     [SerializeField]        private Obstacle[]      obstaclePrefabs = null;
@@ -81,7 +84,7 @@ public class MapController : MonoBehaviour {
 
     private void Update() {
         // difficulty update - loop em'
-        if (InputBuffer.pollAction(InputAction.CHANGE_DIFFICULTY)) {
+        if (InputBuffer.pollAction(InputAction.CHANGE_DIFFICULTY) != null) {
             Difficulty = _initialDifficulty = 1 + _initialDifficulty % spawnpoints.transform.childCount;
         }
 
@@ -149,8 +152,13 @@ public class MapController : MonoBehaviour {
                                        spawnpoints.transform.GetChild(laneIdx).position,
                                        Quaternion.identity,
                                        obstaclesRoot.transform);
+            var tween = obstacle.AddComponent<AppearTween>();
+            tween.duration = appearanceDuration;
         }
     }
+    
+    // ScaleIn tween
+    
 
     private void OnDrawGizmos() {
         foreach (Transform spawnpoint in spawnpoints.transform) {

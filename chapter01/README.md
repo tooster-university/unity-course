@@ -5,8 +5,9 @@
 Controls:
 
 - `[Escape]` anytime to go back to start screen
-- `[Left/Right Arrow]` to change lanes
-- `[Up Arrow]` to fast forward
+- `[Left/Right Arrow]` to change lanes left/right
+- `[F,G,H,J,K]` to change to line 1,2,3,4,5
+- `[L,Up Arrow]` to fast forward
 - `[Space]` to start
 - `[Return]` when not playing to change initial difficulty
 - `[Q]` to quit the game
@@ -37,6 +38,6 @@ Controls:
 - [ ] holes in the ground
 - [ ] buffs and debuffs:
   - [x] slomo - editor only cheat - collectiables ?
-  - skip distance
-  - controls inversion
-  - gravity flip
+  - [ ] skip distance
+  - [ ] controls inversion
+  - [ ] gravity flip

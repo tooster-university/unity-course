@@ -13,7 +13,7 @@ public class PostProcessingController : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        if(volume.profile == null);
+        if (volume.profile == null) return;
         volume.sharedProfile.TryGetSettings(out _vignette);
         vigneteOriginalColor = _vignette.color.value;
     }

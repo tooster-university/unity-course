@@ -7,6 +7,7 @@ using Object = System.Object;
 
 public enum InputAction {
     DASH,
+    CHANGE_LANE,
     RESTART,
     EXIT,
     CHANGE_DIFFICULTY,
@@ -31,29 +32,29 @@ public class InputBuffer : MonoBehaviour {
     // todo: fix InputSystem package not working on Linux 
     // returns true if action was read
     internal static bool peekAction(InputAction action) =>
-        _enabledActions[(int) action]
-     && _actionTimers[(int) action] != null
-     && _now - _actionTimers[(int) action] <= Instance.earlyInputForgiveness;
+        _enabledActions[(int)action]
+     && _actionTimers[(int)action] != null
+     && _now - _actionTimers[(int)action] <= Instance.earlyInputForgiveness;
 
-    // returns true if action was read and consumes the action
-    public static bool pollAction(InputAction action) {
+    /// returns true if action was read and consumes the action
+    public static InputAction? pollAction(InputAction action) {
         var detected = peekAction(action);
 
-        if (detected) _actionTimers[(int) action] = null;
-        return detected;
+        if (detected) _actionTimers[(int)action] = null;
+        return detected ? action : null;
     }
 
-    public static object getData(InputAction action) => _actionData[(int) action];
+    public static object getData(InputAction action) => _actionData[(int)action];
 
     public static void disableActions(params InputAction[] actions) => setActions(false, actions);
 
-    public static void enableActions(params  InputAction[] actions) => setActions(true, actions);
+    public static void enableActions(params InputAction[] actions) => setActions(true, actions);
 
     private static void setActions(bool value, params InputAction[] actions) {
         if (actions.Length == 0) _enabledActions.SetAll(value);
         else
             foreach (var action in actions)
-                _enabledActions[(int) action] = value;
+                _enabledActions[(int)action] = value;
     }
 
     private void Awake() {
@@ -67,13 +68,21 @@ public class InputBuffer : MonoBehaviour {
     }
 
     private void registerKeyDetectors() {
-        KeyDetectors += actionStartedDetector(KeyCode.LeftArrow,  () => { markActionRegistered(InputAction.DASH, MoveDirection.Left); });
-        KeyDetectors += actionStartedDetector(KeyCode.RightArrow, () => { markActionRegistered(InputAction.DASH, MoveDirection.Right); });
+        KeyDetectors += actionStartedDetector(KeyCode.LeftArrow, dash(MoveDirection.Left));
+        KeyDetectors += actionStartedDetector(KeyCode.RightArrow, dash(MoveDirection.Right));
+        KeyDetectors += actionStartedDetector(KeyCode.F, switchLane(0));
+        KeyDetectors += actionStartedDetector(KeyCode.G, switchLane(1));
+        KeyDetectors += actionStartedDetector(KeyCode.H, switchLane(2));
+        KeyDetectors += actionStartedDetector(KeyCode.J, switchLane(3));
+        KeyDetectors += actionStartedDetector(KeyCode.K, switchLane(4));
         KeyDetectors += actionStartedDetector(KeyCode.Space, () => { markActionRegistered(InputAction.RESTART); });
         KeyDetectors += actionStartedDetector(KeyCode.Escape, () => { markActionRegistered(InputAction.EXIT); });
         KeyDetectors += actionStartedDetector(KeyCode.Return, () => { markActionRegistered(InputAction.CHANGE_DIFFICULTY); });
         KeyDetectors += actionStartedDetector(KeyCode.Q, () => { Application.Quit(0); });
     }
+
+    private Action dash(MoveDirection direction) => () => markActionRegistered(InputAction.DASH, direction);
+    private Action switchLane(int     i)         => () => markActionRegistered(InputAction.CHANGE_LANE, i);
 
     private Action actionStartedDetector(KeyCode keyCode, Action actionOnDetection) {
         var isPressed = false;
@@ -87,8 +96,8 @@ public class InputBuffer : MonoBehaviour {
     }
 
     private void markActionRegistered(InputAction action, object data = null) {
-        _actionTimers[(int) action] = _now;
-        _actionData[(int) action]   = data;
+        _actionTimers[(int)action] = _now;
+        _actionData[(int)action] = data;
     }
 
     private event Action KeyDetectors = () => { };
